@@ -1,6 +1,15 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.jetbrains.kotlin.android'
 
+// Release builds pass -PappVersion=x.y.z (from the git tag); local builds are 0.0.0-dev and never see updates.
+// versionCode formula must match Versions.code() in Versions.kt.
+def appVersion = (project.findProperty('appVersion') ?: '0.0.0-dev').toString()
+def appVersionMatch = appVersion =~ /^(\d+)\.(\d+)\.(\d+)$/
+def appVersionCode = appVersionMatch.matches()
+    ? appVersionMatch.group(1).toInteger() * 10000 + appVersionMatch.group(2).toInteger() * 100 + appVersionMatch.group(3).toInteger()
+    : 1
+def releaseKeystore = System.getenv('SPYO_KEYSTORE_PATH')
+
 android {
     namespace = "net.isntall.spyomap"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -8,8 +17,8 @@ android {
         applicationId "net.isntall.spyomap"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode appVersionCode
+        versionName appVersion
         buildConfigField "String", "WEB_CLIENT_ID", "\"${project.findProperty('spyoWebClientId') ?: ''}\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
@@ -24,8 +33,19 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+    signingConfigs {
+        release {
+            if (releaseKeystore) {
+                storeFile file(releaseKeystore)
+                storePassword System.getenv('SPYO_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('SPYO_KEY_ALIAS')
+                keyPassword System.getenv('SPYO_KEY_PASSWORD')
+            }
+        }
+    }
     buildTypes {
         release {
+            signingConfig releaseKeystore ? signingConfigs.release : null
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -55,6 +75,8 @@ dependencies {
     implementation "com.google.android.libraries.identity.googleid:googleid:1.2.1"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0"
     testImplementation "junit:junit:$junitVersion"
+    // Real org.json for JVM unit tests (android.jar only has stubs).
+    testImplementation "org.json:json:20250517"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')

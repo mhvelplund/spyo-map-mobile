@@ -19,7 +19,10 @@ class MainActivity : BridgeActivity() {
             }
         })
         // A recreated activity (e.g. rotation) gets the original intent again; it was handled the first time.
-        if (savedInstanceState == null) handle(intent)
+        if (savedInstanceState == null) {
+            handle(intent)
+            UpdateCheck.run(this)
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
