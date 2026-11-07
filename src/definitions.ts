@@ -1,0 +1,31 @@
+/**
+ * Contract between the native SpyoNative plugin and the web app.
+ *
+ * Source of truth. Mirrored in spyo-map/packages/frontend/src/utils/native.ts — keep the two in sync.
+ * The Android implementation is android/app/src/main/java/net/isntall/spyomap/SpyoNativePlugin.kt; an iOS
+ * implementation must satisfy the same interface.
+ */
+
+export interface PickedPhoto {
+  name: string;
+  mimeType: string;
+  size: number;
+  /** Same-origin URL the page can fetch(): `<server url>/_capacitor_file_<absolute cache path>`. */
+  webPath: string;
+}
+
+export type SignInErrorCode = 'CANCELED' | 'NO_CREDENTIAL' | 'FAILED';
+
+export interface SpyoNativePlugin {
+  /** Google ID token (audience = the web OAuth client). Rejects with `code: SignInErrorCode`. */
+  signIn(options: { silent: boolean }): Promise<{ idToken: string }>;
+  /** Clears the "signed in before" flag and Credential Manager state. */
+  signOut(): Promise<void>;
+  hasSignedInBefore(): Promise<{ value: boolean }>;
+  /** Opens the document picker (multi-select, originals with GPS). Resolves with [] when cancelled. */
+  pickPhotos(): Promise<{ photos: PickedPhoto[] }>;
+  /** Drains photos shared to the app via the Android share sheet. */
+  getSharedPhotos(): Promise<{ photos: PickedPhoto[] }>;
+  /** Fired when new photos are shared while the app is running. */
+  addListener(event: 'photosShared', cb: () => void): Promise<{ remove(): Promise<void> }>;
+}
