@@ -127,9 +127,9 @@ Conventions copied from `spyo-map`: conventional commits (`feat`/`chore`/`feat!`
   asset URL directly.
 - **Device testing (user):** the owner's phone, connected to this PC over adb (USB or wireless). Claude installs
   builds (`adb install -r`) and reads `adb logcat`; the owner does the tapping. The spike gate runs this way.
-- **minSdk 29 / Android 10+ (Claude's call):** `ACCESS_MEDIA_LOCATION`/`setRequireOriginal` need 10+. Permissions:
-  `READ_MEDIA_IMAGES` on 13+, `READ_EXTERNAL_STORAGE` (maxSdk 32) below. On 14+ "Select photos" partial access, check
-  in the spike whether originals stay readable; if not, explain and ask for full access.
+- **minSdk 36 / Android 16+ (user):** single permission set — `READ_MEDIA_IMAGES` + `ACCESS_MEDIA_LOCATION`, no legacy
+  storage branch. For "Select photos" partial access, check in the spike whether originals stay readable with GPS; if
+  not, explain and ask for full access.
 - **Sign out (Claude's call):** clears a native "signed in before" flag and calls Credential Manager
   `clearCredentialState`, so silent re-sign-in doesn't undo it. The next sign-in shows the account chooser, so you can
   switch accounts.
