@@ -32,7 +32,7 @@ class MainActivity : BridgeActivity() {
 
     private fun handle(intent: Intent?) {
         if (intent == null) return
-        val shared = ShareIntents.urisFrom(intent)
+        val shared = ShareIntents.urisFrom(intent, this)
         if (shared.isNotEmpty()) {
             val plugin = bridge.getPlugin("SpyoNative")?.instance as? SpyoNativePlugin
             if (plugin != null) plugin.onPhotosShared(shared) else SpyoNativePlugin.sharedPhotos.add(shared)

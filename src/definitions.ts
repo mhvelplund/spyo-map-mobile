@@ -14,6 +14,12 @@ export interface PickedPhoto {
   webPath: string;
 }
 
+export interface PhotosResult {
+  photos: PickedPhoto[];
+  /** Display names of photos the app could not read (revoked grant, cloud-only item, rejected URI). */
+  failed?: string[];
+}
+
 export interface ListenerHandle {
   remove(): Promise<void> | void;
 }
@@ -27,9 +33,9 @@ export interface SpyoNativePlugin {
   signOut(): Promise<void>;
   hasSignedInBefore(): Promise<{ value: boolean }>;
   /** Opens the document picker (multi-select, originals with GPS). Resolves with [] when cancelled. */
-  pickPhotos(): Promise<{ photos: PickedPhoto[] }>;
+  pickPhotos(): Promise<PhotosResult>;
   /** Drains photos shared to the app via the Android share sheet. */
-  getSharedPhotos(): Promise<{ photos: PickedPhoto[] }>;
+  getSharedPhotos(): Promise<PhotosResult>;
   /**
    * Fired when new photos are shared while the app is running. Through `window.Capacitor.Plugins` (no
    * @capacitor/core in the page) this returns the handle synchronously; via registerPlugin it is a Promise.

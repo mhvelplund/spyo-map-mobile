@@ -21,6 +21,7 @@ class PhotoImporter(private val context: Context) {
 
     /** Null when the URI can't be read (revoked grant, cloud-only item that fails to download, ...). */
     fun import(uri: Uri): ImportedPhoto? {
+        if (!ShareIntents.isAcceptable(uri, context)) return null
         val resolver = context.contentResolver
         val name = displayName(uri) ?: "photo.jpg"
         val mimeType = resolver.getType(uri) ?: "image/jpeg"
@@ -54,7 +55,7 @@ class PhotoImporter(private val context: Context) {
         return resolver.openInputStream(uri) ?: throw IllegalStateException("Cannot open $uri")
     }
 
-    private fun displayName(uri: Uri): String? = try {
+    fun displayName(uri: Uri): String? = try {
         context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
             if (c.moveToFirst()) c.getString(0) else null
         }

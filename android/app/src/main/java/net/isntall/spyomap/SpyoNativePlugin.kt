@@ -146,12 +146,12 @@ class SpyoNativePlugin : Plugin() {
         val importer = PhotoImporter(context)
         val base = (bridge.serverUrl ?: bridge.localUrl).trimEnd('/')
         scope.launch {
-            val photos = withContext(Dispatchers.IO) {
+            val result = withContext(Dispatchers.IO) {
                 importer.cleanUp()
-                uris.mapNotNull { importer.import(it) }
+                PhotoImports.importAll(uris, importer::import, importer::displayName)
             }
             val array = JSArray()
-            for (p in photos) {
+            for (p in result.imported) {
                 array.put(
                     JSObject()
                         .put("name", p.name)
@@ -160,7 +160,7 @@ class SpyoNativePlugin : Plugin() {
                         .put("webPath", base + Bridge.CAPACITOR_FILE_START + p.file.absolutePath),
                 )
             }
-            call.resolve(JSObject().put("photos", array))
+            call.resolve(JSObject().put("photos", array).put("failed", JSArray(result.failed)))
         }
     }
 

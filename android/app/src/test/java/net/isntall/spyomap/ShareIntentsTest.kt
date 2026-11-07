@@ -1,6 +1,8 @@
 package net.isntall.spyomap
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ShareIntentsTest {
@@ -39,5 +41,23 @@ class ShareIntentsTest {
     @Test
     fun duplicateStreamsInOneIntentAreDropped() {
         assertEquals(listOf("a", "b"), ShareIntents.urisFrom(sendMultiple, "image/*", null, listOf("a", "b", "a")))
+    }
+
+    private val own = "net.isntall.spyomap.fileprovider"
+
+    @Test
+    fun contentUrisFromOtherAppsAreAccepted() {
+        assertTrue(ShareIntents.isAcceptable("content", "com.google.android.apps.photos.contentprovider", own))
+        assertTrue(ShareIntents.isAcceptable("content", "media", own))
+    }
+
+    @Test
+    fun fileUrisAndOurOwnProviderAreRejected() {
+        assertFalse(ShareIntents.isAcceptable("file", null, own))
+        assertFalse(ShareIntents.isAcceptable("file", "", own))
+        assertFalse(ShareIntents.isAcceptable("content", own, own))
+        assertFalse(ShareIntents.isAcceptable("content", null, own))
+        assertFalse(ShareIntents.isAcceptable("https", "evil.test", own))
+        assertFalse(ShareIntents.isAcceptable(null, "media", own))
     }
 }

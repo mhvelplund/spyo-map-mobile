@@ -1,5 +1,6 @@
 package net.isntall.spyomap
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 
@@ -14,10 +15,22 @@ object ShareIntents {
         }
     }
 
-    fun urisFrom(intent: Intent): List<Uri> = urisFrom(
+    /**
+     * MainActivity is exported, so any app can send it a share. Only content:// URIs from other apps are read:
+     * file:// or our own FileProvider would let a caller make us copy our private files where the page can read them.
+     */
+    fun isAcceptable(scheme: String?, authority: String?, ownAuthority: String): Boolean =
+        scheme == "content" && !authority.isNullOrEmpty() && authority != ownAuthority
+
+    fun isAcceptable(uri: Uri, context: Context): Boolean =
+        isAcceptable(uri.scheme, uri.authority, ownAuthority(context))
+
+    fun ownAuthority(context: Context) = "${context.packageName}.fileprovider"
+
+    fun urisFrom(intent: Intent, context: Context): List<Uri> = urisFrom(
         intent.action,
         intent.type,
         intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java),
         intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java),
-    )
+    ).filter { isAcceptable(it, context) }
 }
