@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="upload"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_upload"
+        android:shortcutLongLabel="@string/shortcut_upload_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://spyo-map.isntall.net/#/upload"
+            android:targetPackage="net.isntall.spyomap"
+            android:targetClass="net.isntall.spyomap.MainActivity" />
+    </shortcut>
+</shortcuts>

@@ -4,4 +4,6 @@
     <string name="title_activity_main">Spyo Map</string>
     <string name="package_name">net.isntall.spyomap</string>
     <string name="custom_url_scheme">net.isntall.spyomap</string>
+    <string name="shortcut_upload">Upload</string>
+    <string name="shortcut_upload_long">Upload photos</string>
 </resources>
