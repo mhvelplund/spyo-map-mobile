@@ -14,6 +14,10 @@ export interface PickedPhoto {
   webPath: string;
 }
 
+export interface ListenerHandle {
+  remove(): Promise<void> | void;
+}
+
 export type SignInErrorCode = 'CANCELED' | 'NO_CREDENTIAL' | 'FAILED';
 
 export interface SpyoNativePlugin {
@@ -26,6 +30,9 @@ export interface SpyoNativePlugin {
   pickPhotos(): Promise<{ photos: PickedPhoto[] }>;
   /** Drains photos shared to the app via the Android share sheet. */
   getSharedPhotos(): Promise<{ photos: PickedPhoto[] }>;
-  /** Fired when new photos are shared while the app is running. */
-  addListener(event: 'photosShared', cb: () => void): Promise<{ remove(): Promise<void> }>;
+  /**
+   * Fired when new photos are shared while the app is running. Through `window.Capacitor.Plugins` (no
+   * @capacitor/core in the page) this returns the handle synchronously; via registerPlugin it is a Promise.
+   */
+  addListener(event: 'photosShared', cb: () => void): ListenerHandle | Promise<ListenerHandle>;
 }
