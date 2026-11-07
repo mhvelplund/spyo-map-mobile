@@ -146,3 +146,26 @@ App icon/splash art (reuse site favicon), exact Kotlin structure, update-check U
   back button navigates/exits, external links open in browser; native sign-in sets session and survives app restart;
   pick 5 geotagged gallery photos → all "Added"; Share 2 photos from Samsung Gallery → land on upload page and upload;
   re-pick same photos → "Duplicates skipped"; tagging `v0.0.2` produces a release the installed app offers as update.
+
+## Spike findings (2026-11-07, Pixel 9 Pro, Android 17, Capacitor 8.6.0)
+
+- **(a) Picking — pass with `ACTION_OPEN_DOCUMENT`.** After granting `READ_MEDIA_IMAGES` + `ACCESS_MEDIA_LOCATION`,
+  document-picker URIs (`com.android.providers.media.documents`) read GPS directly; `MediaStore.getMediaUri` +
+  `setRequireOriginal` also works. The **system photo picker (`ACTION_PICK_IMAGES`) redacts GPS to 0,0** and refuses
+  `setRequireOriginal` ("only supported for Picker URIs when location sharing is explicitly granted"). Decision: use
+  `ACTION_OPEN_DOCUMENT` (`image/*`, `EXTRA_ALLOW_MULTIPLE`); open via `setRequireOriginal(getMediaUri(...))` when
+  available, else the document URI.
+- **(b) Share — GPS kept** from Files (`com.google.android.apps.nbu.files.provider`) and Google Photos
+  (`com.google.android.apps.photos.contentprovider/.../REQUIRE_ORIGINAL/...`). `setRequireOriginal` isn't supported for
+  those providers; read them directly. The same share intent was delivered twice (onCreate after process start +
+  re-delivery): de-duplicate pending shares by URI. Importing a 14.6 MB share took ~2.7 s; import off the main thread.
+- **(c) Transport — pass with a fetchable URL.** With `server.url` set, `Capacitor.convertFileSrc(path)` yields
+  `https://spyo-map.isntall.net/_capacitor_file_<abs path>` (same origin as the page), served by Capacitor's local
+  server. `fetch()` of 3 × ~3.6 MB returned 200, `image/jpeg`, exact sizes, in 150 ms. Contract unchanged: plugin
+  returns `webPath` = server URL + `/_capacitor_file_` + absolute cache path.
+- Capacitor injects its bridge into the remote origin (`window.Capacitor.isNativePlatform() === true`, plugins listed).
+  Its proxy only re-fetches `GET` requests that accept `text/html`; API `fetch`/`POST`/`PUT` and cookies go through the
+  WebView unchanged.
+- **(d) Credential Manager — deferred to Task 6** (would need a throwaway Android OAuth client for the spike package).
+- Build note: the owner's global `~/.gradle/gradle.properties` pins `org.gradle.java.home` to JDK 17; Capacitor 8 needs
+  JDK 21 → pass `-Dorg.gradle.java.home=<jdk21>` (CI unaffected).
