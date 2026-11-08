@@ -1,4 +1,21 @@
 [tools]
-node = "lts"
+node = "24"
 java = "temurin-21"
+go = "latest"
 gh = "latest"
+"go:github.com/mhvelplund/git-stack/cmd/git-stack" = "latest"
+"go:github.com/mhvelplund/git-stack/cmd/git-stack-github" = "latest"
+
+# The global ~/.gradle/gradle.properties pins JDK 17, which overrides JAVA_HOME; force mise's JDK 21.
+# Extra args are appended, e.g. `mise run gradle testDebugUnitTest --tests net.isntall.spyomap.VersionsTest`.
+[tasks.gradle]
+description = "Run the Gradle wrapper with mise's JDK"
+dir = "{{config_root}}/android"
+shell = "bash -c"
+run = './gradlew -Dorg.gradle.java.home="$JAVA_HOME"'
+
+[tasks.build]
+description = "Debug APK + unit tests"
+dir = "{{config_root}}/android"
+shell = "bash -c"
+run = './gradlew -Dorg.gradle.java.home="$JAVA_HOME" assembleDebug testDebugUnitTest'

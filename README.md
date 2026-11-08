@@ -22,10 +22,12 @@ from your browser when asked). The app offers new versions itself when you open 
 mise install
 npm ci
 npx cap sync android
-cd android
-./gradlew -Dorg.gradle.java.home="$(mise where java)" assembleDebug testDebugUnitTest
-adb install -r app/build/outputs/apk/debug/app-debug.apk
+mise run build                 # debug APK + unit tests
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
 ```
+
+Needs an Android SDK with `ANDROID_HOME` set (Android Studio's is fine). Run other Gradle tasks with
+`mise run gradle <task>`.
 
 Inspect the WebView from desktop Chrome at `chrome://inspect` (debug builds only).
 
@@ -39,7 +41,7 @@ which the Worker verifies (`POST /auth/google/idtoken`).
 1. Put the web client ID in `android/gradle.properties` as `spyoWebClientId=...apps.googleusercontent.com`.
 2. In Google Cloud Console → APIs & Services → Credentials (same project as the web client), create an **Android**
    OAuth client for package `net.isntall.spyomap` for **each** signing key's SHA-1:
-   - debug: `cd android && ./gradlew signingReport` (variant `debug`)
+   - debug: `mise run gradle signingReport` (variant `debug`)
    - release: `keytool -list -v -keystore spyo-release.jks -alias spyo`
 
 ### Release signing
