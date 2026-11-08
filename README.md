@@ -1,5 +1,11 @@
 # Spyo Map for Android
 
+> [!TIP]
+> 
+> This is a companion app for the [spyo-map](https://github.com/mhvelplund/spyo-map) project.
+
+<img src="docs/img/slop-small.jpg" alt="For robots, by robots. Vibed without love or skill." height="24" />
+
 An Android app for [Spyo Map](https://spyo-map.isntall.net). It shows the live web map full-screen and adds what the
 browser can't do on Android:
 
@@ -39,8 +45,8 @@ Native sign-in uses Android Credential Manager and returns an ID token for the s
 which the Worker verifies (`POST /auth/google/idtoken`).
 
 1. Put the web client ID in `android/gradle.properties` as `spyoWebClientId=...apps.googleusercontent.com`.
-2. In Google Cloud Console → APIs & Services → Credentials (same project as the web client), create an **Android**
-   OAuth client for package `net.isntall.spyomap` for **each** signing key's SHA-1:
+2. In Google Cloud Console → APIs & Services → Credentials (same project as the web client), create an **Android** OAuth
+   client for package `net.isntall.spyomap` for **each** signing key's SHA-1:
    - debug: `mise run gradle signingReport` (variant `debug`)
    - release: `keytool -list -v -keystore spyo-release.jks -alias spyo`
 
