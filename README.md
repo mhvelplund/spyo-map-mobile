@@ -13,6 +13,8 @@ browser can't do on Android:
   uses the system document picker, which keeps the original location data.
 - **Share to Spyo Map** from Google Photos, Files or your gallery app.
 - **Google sign-in** with the account on your phone.
+- **Starts where you are.** The map opens on your location (asks for location permission once), and the green album
+  button opens your gallery so you can share photos straight back.
 
 Requires Android 16 or newer. Only allow-listed uploaders can upload; anyone can browse.
 

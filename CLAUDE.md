@@ -39,6 +39,8 @@ in the `spyo-map` repo, not here.
 - Sign-in: Credential Manager → Google ID token for the **web** OAuth client (`spyoWebClientId` in
   `android/gradle.properties` → `BuildConfig.WEB_CLIENT_ID`); the Worker verifies it at `POST /auth/google/idtoken`.
   Each signing key's SHA-1 needs an Android OAuth client (see README).
+- `openGallery` launches the gallery app (`CATEGORY_APP_GALLERY`) for the map page's album button. The location
+  permissions in the manifest exist only for `navigator.geolocation` in the WebView (Capacitor prompts at runtime).
 - `UpdateCheck` queries GitHub Releases on cold start. Local builds are `0.0.0-dev` and never prompt.
 - Versioning: release builds pass `-PappVersion=x.y.z` from the tag. The versionCode formula is duplicated in
   `android/app/build.gradle` and `Versions.code()` — change both together.
