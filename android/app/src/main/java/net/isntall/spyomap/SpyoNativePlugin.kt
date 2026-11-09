@@ -2,6 +2,7 @@ package net.isntall.spyomap
 
 import android.Manifest
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -124,6 +125,18 @@ class SpyoNativePlugin : Plugin() {
 
     @PermissionCallback
     private fun sharedAfterPermission(call: PluginCall) = resolvePhotos(call, sharedPhotos.drain())
+
+    @PluginMethod
+    fun openGallery(call: PluginCall) {
+        val intent = Intent.makeMainSelectorActivity(Intent.ACTION_MAIN, Intent.CATEGORY_APP_GALLERY)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            activity.startActivity(intent)
+            call.resolve()
+        } catch (_: ActivityNotFoundException) {
+            call.reject("No gallery app installed", "NO_APP")
+        }
+    }
 
     /** Called by MainActivity when photos are shared to the app. */
     fun onPhotosShared(uris: List<Uri>) {
