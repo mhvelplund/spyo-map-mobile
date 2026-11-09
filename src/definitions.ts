@@ -36,6 +36,8 @@ export interface SpyoNativePlugin {
   pickPhotos(): Promise<PhotosResult>;
   /** Drains photos shared to the app via the Android share sheet. */
   getSharedPhotos(): Promise<PhotosResult>;
+  /** Opens the phone's photo gallery app. Rejects with `code: 'NO_APP'` when none is installed. */
+  openGallery(): Promise<void>;
   /**
    * Fired when new photos are shared while the app is running. Through `window.Capacitor.Plugins` (no
    * @capacitor/core in the page) this returns the handle synchronously; via registerPlugin it is a Promise.
